@@ -2,30 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Pick List Supervisor</title>
+  <title>Pick List Supervisor Dashboard</title>
   <link rel="stylesheet" href="style.css" />
-  <script src="../config/config.js"></script>
 </head>
 <body>
 
 <h2>Pick List Supervisor Dashboard</h2>
 
-<!-- 🔒 FILE UPLOAD VIA FORM (RELIABLE) -->
 <form
+  id="uploadForm"
   action="https://script.google.com/macros/s/AKfycbxx8sqKrRXqIMWVmzKGGzNMe2xOFAVnCVFnHDGwKWttKEFV9B40l1O4kH3-ofUaIZtN1A/exec"
   method="POST"
   enctype="multipart/form-data"
   target="uploadFrame"
+  onsubmit="onUploadStart()"
 >
   <input type="hidden" name="action" value="upload" />
 
   <input type="file" name="file" accept="application/pdf" required />
-  <input type="text" name="supervisor" placeholder="Supervisor Name" required />
-
   <button type="submit">Upload Pick List</button>
 </form>
 
-<!-- hidden iframe to avoid page redirect -->
+<p id="uploadStatus" class="status"></p>
+
 <iframe name="uploadFrame" style="display:none"></iframe>
 
 <hr />
@@ -42,7 +41,7 @@
   </thead>
   <tbody id="picklistTable">
     <tr>
-      <td colspan="5" class="empty">Loading pick lists…</td>
+      <td colspan="5">Loading…</td>
     </tr>
   </tbody>
 </table>
