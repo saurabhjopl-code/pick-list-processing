@@ -1,13 +1,11 @@
 document.addEventListener("DOMContentLoaded", loadPickLists);
 
-/* ---------------- UPLOAD ---------------- */
-
-function uploadPickList() {
-  const file = document.getElementById("pdf").files[0];
+function processPickList() {
+  const driveLink = document.getElementById("driveLink").value.trim();
   const supervisor = document.getElementById("supervisor").value.trim();
 
-  if (!file) {
-    alert("Please select a PDF file");
+  if (!driveLink) {
+    alert("Please paste Google Drive PDF link");
     return;
   }
   if (!supervisor) {
@@ -15,37 +13,30 @@ function uploadPickList() {
     return;
   }
 
-  const formData = new FormData();
-  formData.append("action", "upload");
-  formData.append("supervisor", supervisor);
-  formData.append("file", file);
-
   fetch(CONFIG.API_URL, {
     method: "POST",
-    body: formData
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "processDrivePdf",
+      driveLink,
+      supervisor
+    })
   })
     .then(r => r.json())
     .then(res => {
-      if (res.error) {
-        alert(res.error);
-      } else {
-        alert("Pick list uploaded successfully");
+      if (res.error) alert(res.error);
+      else {
+        alert("Pick list processed successfully");
         loadPickLists();
       }
     })
     .catch(() => alert("Upload failed"));
 }
 
-/* ---------------- LOAD LIST ---------------- */
-
 function loadPickLists() {
   fetch(CONFIG.API_URL + "?action=list")
     .then(r => r.json())
-    .then(renderTable)
-    .catch(() => {
-      document.getElementById("picklistTable").innerHTML =
-        `<tr><td colspan="5">Failed to load data</td></tr>`;
-    });
+    .then(renderTable);
 }
 
 function renderTable(data) {
@@ -59,56 +50,41 @@ function renderTable(data) {
   }
 
   data.forEach(row => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${row.pickListId}</td>
-      <td>${row.totalQty}</td>
-      <td>${row.pickedQty}</td>
-      <td>${row.status}</td>
-      <td>${actionButtons(row)}</td>
-    `;
-    tbody.appendChild(tr);
+    tbody.innerHTML += `
+      <tr>
+        <td>${row.pickListId}</td>
+        <td>${row.totalQty}</td>
+        <td>${row.pickedQty}</td>
+        <td>${row.status}</td>
+        <td>${actionButtons(row)}</td>
+      </tr>`;
   });
 }
-
-/* ---------------- ACTIONS ---------------- */
 
 function actionButtons(row) {
   if (row.status === "OPEN") {
     return `
-      <button class="btn-delete" onclick="deletePick('${row.pickListId}')">Delete</button>
-      <button class="btn-close" onclick="forceClose('${row.pickListId}')">Close</button>
-    `;
+      <button onclick="deletePick('${row.pickListId}')">Delete</button>
+      <button onclick="forceClose('${row.pickListId}')">Close</button>`;
   }
   if (row.status === "WORKING") {
-    return `
-      <span class="locked">Locked</span>
-      <button class="btn-close" onclick="forceClose('${row.pickListId}')">Close</button>
-    `;
+    return `<button onclick="forceClose('${row.pickListId}')">Close</button>`;
   }
-  return `<span class="locked">Closed</span>`;
+  return "Closed";
 }
 
 function deletePick(id) {
-  if (!confirm(`Delete pick list ${id}? This cannot be undone.`)) return;
-
   fetch(`${CONFIG.API_URL}?action=delete&pickListId=${id}&user=Supervisor`)
     .then(r => r.json())
-    .then(res => {
-      if (res.error) alert(res.error);
-      else loadPickLists();
-    });
+    .then(() => loadPickLists());
 }
 
 function forceClose(id) {
-  const reason = prompt("Reason for closing this pick list:");
+  const reason = prompt("Reason for closing:");
   if (!reason) return;
 
   fetch(
-    `${CONFIG.API_URL}?action=forceClose&pickListId=${id}&user=Supervisor&reason=${encodeURIComponent(
-      reason
-    )}`
+    `${CONFIG.API_URL}?action=forceClose&pickListId=${id}&user=Supervisor&reason=${encodeURIComponent(reason)}`
   )
     .then(r => r.json())
     .then(() => loadPickLists());
