@@ -1,28 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
   <title>Pick List Supervisor</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
   <script src="../config/config.js"></script>
 </head>
 <body>
+
 <h2>Pick List Supervisor Dashboard</h2>
 
-<input type="file" id="pdf">
-<input type="text" id="supervisor" placeholder="Supervisor Name">
-<button onclick="upload()">Upload Pick List</button>
+<div class="upload-box">
+  <input type="file" id="pdf" accept="application/pdf" />
+  <input type="text" id="supervisor" placeholder="Supervisor Name" />
+  <button onclick="uploadPickList()">Upload Pick List</button>
+</div>
 
-<table id="list">
-<thead>
-<tr>
-<th>Pick List ID</th>
-<th>Total Qty</th>
-<th>Picked</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody></tbody>
+<table>
+  <thead>
+    <tr>
+      <th>Pick List ID</th>
+      <th>Total Qty</th>
+      <th>Picked Qty</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="picklistTable">
+    <tr>
+      <td colspan="5" class="empty">Upload a pick list to begin</td>
+    </tr>
+  </tbody>
 </table>
 
 <script src="app.js"></script>
