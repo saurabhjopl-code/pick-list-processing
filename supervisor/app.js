@@ -1,42 +1,14 @@
-document.addEventListener("DOMContentLoaded", loadPickLists);
-
-function processPickList() {
-  const driveLink = document.getElementById("driveLink").value.trim();
-  const supervisor = document.getElementById("supervisor").value.trim();
-
-  if (!driveLink) {
-    alert("Please paste Google Drive PDF link");
-    return;
-  }
-  if (!supervisor) {
-    alert("Please enter Supervisor name");
-    return;
-  }
-
-  fetch(CONFIG.API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      action: "processDrivePdf",
-      driveLink,
-      supervisor
-    })
-  })
-    .then(r => r.json())
-    .then(res => {
-      if (res.error) alert(res.error);
-      else {
-        alert("Pick list processed successfully");
-        loadPickLists();
-      }
-    })
-    .catch(() => alert("Upload failed"));
-}
+document.addEventListener("DOMContentLoaded", () => {
+  loadPickLists();
+  // refresh list after upload
+  setInterval(loadPickLists, 3000);
+});
 
 function loadPickLists() {
   fetch(CONFIG.API_URL + "?action=list")
     .then(r => r.json())
-    .then(renderTable);
+    .then(renderTable)
+    .catch(() => {});
 }
 
 function renderTable(data) {
@@ -56,16 +28,17 @@ function renderTable(data) {
         <td>${row.totalQty}</td>
         <td>${row.pickedQty}</td>
         <td>${row.status}</td>
-        <td>${actionButtons(row)}</td>
+        <td>${actions(row)}</td>
       </tr>`;
   });
 }
 
-function actionButtons(row) {
+function actions(row) {
   if (row.status === "OPEN") {
     return `
       <button onclick="deletePick('${row.pickListId}')">Delete</button>
-      <button onclick="forceClose('${row.pickListId}')">Close</button>`;
+      <button onclick="forceClose('${row.pickListId}')">Close</button>
+    `;
   }
   if (row.status === "WORKING") {
     return `<button onclick="forceClose('${row.pickListId}')">Close</button>`;
@@ -74,8 +47,8 @@ function actionButtons(row) {
 }
 
 function deletePick(id) {
+  if (!confirm(`Delete pick list ${id}?`)) return;
   fetch(`${CONFIG.API_URL}?action=delete&pickListId=${id}&user=Supervisor`)
-    .then(r => r.json())
     .then(() => loadPickLists());
 }
 
@@ -86,6 +59,5 @@ function forceClose(id) {
   fetch(
     `${CONFIG.API_URL}?action=forceClose&pickListId=${id}&user=Supervisor&reason=${encodeURIComponent(reason)}`
   )
-    .then(r => r.json())
     .then(() => loadPickLists());
 }
