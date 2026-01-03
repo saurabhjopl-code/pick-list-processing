@@ -42,3 +42,15 @@ th {
 .empty {
   color: #888;
 }
+
+.btn-delete {
+  color: #c0392b;
+}
+
+.btn-close {
+  color: #d35400;
+}
+
+.locked {
+  color: #999;
+}
