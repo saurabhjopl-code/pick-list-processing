@@ -10,11 +10,25 @@
 
 <h2>Pick List Supervisor Dashboard</h2>
 
-<div class="upload-box">
-  <input type="text" id="driveLink" placeholder="Paste Google Drive PDF link" />
-  <input type="text" id="supervisor" placeholder="Supervisor Name" />
-  <button onclick="processPickList()">Process Pick List</button>
-</div>
+<!-- 🔒 FILE UPLOAD VIA FORM (RELIABLE) -->
+<form
+  action="https://script.google.com/macros/s/AKfycbxx8sqKrRXqIMWVmzKGGzNMe2xOFAVnCVFnHDGwKWttKEFV9B40l1O4kH3-ofUaIZtN1A/exec"
+  method="POST"
+  enctype="multipart/form-data"
+  target="uploadFrame"
+>
+  <input type="hidden" name="action" value="upload" />
+
+  <input type="file" name="file" accept="application/pdf" required />
+  <input type="text" name="supervisor" placeholder="Supervisor Name" required />
+
+  <button type="submit">Upload Pick List</button>
+</form>
+
+<!-- hidden iframe to avoid page redirect -->
+<iframe name="uploadFrame" style="display:none"></iframe>
+
+<hr />
 
 <table>
   <thead>
