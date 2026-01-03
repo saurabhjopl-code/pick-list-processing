@@ -1,11 +1,15 @@
-document.addEventListener("DOMContentLoaded", () => {
-  loadPickLists();
-  // refresh list after upload
-  setInterval(loadPickLists, 3000);
-});
+document.addEventListener("DOMContentLoaded", loadPickLists);
+
+function onUploadStart() {
+  const status = document.getElementById("uploadStatus");
+  status.textContent = "Uploading pick list… please wait";
+
+  // refresh list after upload finishes
+  setTimeout(loadPickLists, 3000);
+}
 
 function loadPickLists() {
-  fetch(CONFIG.API_URL + "?action=list")
+  fetch("https://script.google.com/macros/s/AKfycbxx8sqKrRXqIMWVmzKGGzNMe2xOFAVnCVFnHDGwKWttKEFV9B40l1O4kH3-ofUaIZtN1A/exec?action=list")
     .then(r => r.json())
     .then(renderTable)
     .catch(() => {});
@@ -17,7 +21,7 @@ function renderTable(data) {
 
   if (!data.length) {
     tbody.innerHTML =
-      `<tr><td colspan="5" class="empty">No pick lists found</td></tr>`;
+      `<tr><td colspan="5">No pick lists found</td></tr>`;
     return;
   }
 
@@ -29,7 +33,8 @@ function renderTable(data) {
         <td>${row.pickedQty}</td>
         <td>${row.status}</td>
         <td>${actions(row)}</td>
-      </tr>`;
+      </tr>
+    `;
   });
 }
 
@@ -47,17 +52,16 @@ function actions(row) {
 }
 
 function deletePick(id) {
-  if (!confirm(`Delete pick list ${id}?`)) return;
-  fetch(`${CONFIG.API_URL}?action=delete&pickListId=${id}&user=Supervisor`)
+  fetch(`https://script.google.com/macros/s/AKfycbxx8sqKrRXqIMWVmzKGGzNMe2xOFAVnCVFnHDGwKWttKEFV9B40l1O4kH3-ofUaIZtN1A/exec?action=delete&pickListId=${id}&user=Supervisor`)
     .then(() => loadPickLists());
 }
 
 function forceClose(id) {
-  const reason = prompt("Reason for closing:");
+  const reason = prompt("Reason for closing pick list:");
   if (!reason) return;
 
   fetch(
-    `${CONFIG.API_URL}?action=forceClose&pickListId=${id}&user=Supervisor&reason=${encodeURIComponent(reason)}`
+    `https://script.google.com/macros/s/AKfycbxx8sqKrRXqIMWVmzKGGzNMe2xOFAVnCVFnHDGwKWttKEFV9B40l1O4kH3-ofUaIZtN1A/exec?action=forceClose&pickListId=${id}&user=Supervisor&reason=${encodeURIComponent(reason)}`
   )
     .then(() => loadPickLists());
 }
