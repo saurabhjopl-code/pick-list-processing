@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pick List Supervisor</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="../config/config.js"></script>
+</head>
+<body>
+<h2>Pick List Supervisor Dashboard</h2>
+
+<input type="file" id="pdf">
+<input type="text" id="supervisor" placeholder="Supervisor Name">
+<button onclick="upload()">Upload Pick List</button>
+
+<table id="list">
+<thead>
+<tr>
+<th>Pick List ID</th>
+<th>Total Qty</th>
+<th>Picked</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<script src="app.js"></script>
+</body>
+</html>
